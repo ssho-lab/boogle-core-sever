@@ -21,10 +21,15 @@ public interface SellItemRepository extends MongoRepository<SellItem, String> {
     List<SellItem> findAllGroupByItemIdContaining(String keyword);
 
     Optional<List<SellItem>> findTop4ByIsTradedOrderByRegiTimeDesc(boolean isTraded);
+    Optional<List<SellItem>> findTop12ByIsTradedOrderByRegiTimeDesc(boolean isTraded);
     Optional<List<SellItem>> findTop4ByIsTradedOrderByRegiPriceAsc(boolean isTraded);
     Optional<List<SellItem>> findAllByItemIdAndIsTraded(String itemId, boolean isTraded);
 
     Optional<List<SellItem>> findAllBySellerId(int sellerId);
+
+    void deleteBy_idAndSellerId(String id, int sellerId);
+
+    Optional<SellItem> findBySellerBankAccountId(String sellerBankAccountId);
 
 }
 

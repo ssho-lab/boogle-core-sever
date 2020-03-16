@@ -127,31 +127,6 @@ public class UserService {
     }
 
     /**
-     * 회원 정보 인증
-     *
-     * @param signInReq 회원 데이터
-     * @return DefaultRes
-     */
-    public String getUserToken(final SignInReq signInReq) {
-        try {
-            if(userRepository.findByEmail(signInReq.getEmail()).isPresent()){
-                User user = userRepository.findByEmail(signInReq.getEmail()).get();
-                if(passwordEncoder.matches(signInReq.getPassword(), user.getPassword())){
-                    final JwtService.TokenRes tokenRes =
-                            new JwtService.TokenRes(jwtService.create(user.getId()));
-                    return tokenRes.getToken();
-                }
-                else { return ""; }
-            }
-            else{
-                return "";
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-            return "";
-        }
-    }
-    /**
      * 이메일 중복 검사
      *
      * @param email 회원 이메일
@@ -312,16 +287,6 @@ public class UserService {
         }
     }
 
-
-    /**
-     * @return 인증을 위해 사용자에게 전달 될 네 자리의 인증 번호
-     */
-    private String getAuthenticationNumber() {
-        Random random = new Random();
-
-        return String.valueOf(random.nextInt(9000) + 1000);
-    }
-
     public int authorization(final String jwt) {
 
         final int userIdx = jwtService.decode(jwt).getUser_idx();
@@ -351,6 +316,28 @@ public class UserService {
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "회원 정보 목록 열람 실패");
+        }
+    }
+
+    /**
+     * 회원 토큰과 회원 고유 번호 비교
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes compareBetweenUserTokenAndUserId(int userIdFromToken, int userId) {
+        try {
+
+            if(userIdFromToken == userId) {
+                return DefaultRes.res(StatusCode.OK, "같은 유저입니다.", true);
+            }
+            else{
+                return DefaultRes.res(StatusCode.OK, "다른 유저입니다.", false);
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 토큰과 회원 고유 번호 비교 실패");
         }
     }
 }

@@ -8,6 +8,7 @@ import kr.ant.booksharing.repository.ItemReceivingRepository;
 import kr.ant.booksharing.repository.ItemRepository;
 import kr.ant.booksharing.repository.SellItemHistoryRepository;
 import kr.ant.booksharing.repository.SellItemRepository;
+import kr.ant.booksharing.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
@@ -38,15 +39,18 @@ public class NaverBookApiController {
     private final ItemRepository itemRepository;
     private final ItemReceivingRepository itemReceivingRepository;
     private final SellItemHistoryRepository sellItemHistoryRepository;
+    private final SearchService searchService;
 
     public NaverBookApiController(final SellItemRepository sellItemRepository,
                                   final ItemRepository itemRepository,
                                   final ItemReceivingRepository itemReceivingRepository,
-                                  final SellItemHistoryRepository sellItemHistoryRepository) {
+                                  final SellItemHistoryRepository sellItemHistoryRepository,
+                                  final SearchService searchService) {
         this.sellItemRepository = sellItemRepository;
         this.itemRepository = itemRepository;
         this.itemReceivingRepository = itemReceivingRepository;
         this.sellItemHistoryRepository = sellItemHistoryRepository;
+        this.searchService = searchService;
     }
 
     @GetMapping("naver/bookApi/buy/title")
@@ -64,16 +68,15 @@ public class NaverBookApiController {
             List<ItemRes> itemResList = new ArrayList<>();
             List<ItemRes> itemNotRegisteredResList = new ArrayList<>();
 
-           //if (itemRepository.findAllByTitleOrSubjectListOrProfessorListContaining(keyword).isPresent()) {
             if (!itemRepository.findAll().isEmpty()) {
-               //List<Item> itemList = itemRepository.findAllByTitleOrSubjectListOrProfessorListContaining(keyword).get();
                 List<Item> itemList = itemRepository.findAll();
                 for (Item item : itemList) {
 
                     boolean isKeywordMatched = false;
 
-                    if(item.getTitle().contains(keyword) || keyword.contains(item.getTitle())) isKeywordMatched = true;
+                    if(searchService.search(keyword, item.getTitle())) isKeywordMatched = true;
 
+                    //if(item.getTitle().contains(keyword) || keyword.contains(item.getTitle())) isKeywordMatched = true;
 
                     for(String subject : item.getSubjectList()){
                         if(subject == null || subject.equals("") || subject.length() == 0) break;

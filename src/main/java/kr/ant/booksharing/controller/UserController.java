@@ -160,4 +160,22 @@ public class UserController {
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }
+
+    /**
+     * 회원 토큰과 회원 고유 번호 비교
+     *
+     * @return ResponseEntity
+     */
+    @Auth
+    @GetMapping("/comparison")
+    public ResponseEntity compareBetweenUserTokenAndUserId(@RequestParam("userId") int userId,
+                                     final HttpServletRequest httpServletRequest) {
+        try {
+            final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
+            return new ResponseEntity<>(userService.compareBetweenUserTokenAndUserId(userIdx, userId), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
 }

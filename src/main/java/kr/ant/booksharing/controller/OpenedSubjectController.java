@@ -68,7 +68,8 @@ public class OpenedSubjectController {
     }
 
     @GetMapping("save")
-    public ResponseEntity save() {
+    public ResponseEntity save(@RequestParam("campus") final String campus, @RequestParam("year") final String year,
+                               @RequestParam("semester") final String semester) {
         try {
             SubjectTest subjectTest = new SubjectTest();
             ArrayList<String> strings [] = new ArrayList[6];
@@ -110,7 +111,7 @@ public class OpenedSubjectController {
             subjectTest.setProfessor(strings[5]);
 
 
-            return new ResponseEntity<>(openedSubjectService.save(subjectTest), HttpStatus.OK);
+            return new ResponseEntity<>(openedSubjectService.save(subjectTest, campus, year, semester), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

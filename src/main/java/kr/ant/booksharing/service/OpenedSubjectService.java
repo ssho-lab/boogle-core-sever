@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class OpenedSubjectService {
     private final OpenedSubjectRepository openedSubjectRepository;
 
-    public OpenedSubjectService(final OpenedSubjectRepository openedSubjectRepository){
+    public OpenedSubjectService(final OpenedSubjectRepository openedSubjectRepository) {
         this.openedSubjectRepository = openedSubjectRepository;
     }
 
@@ -28,7 +28,7 @@ public class OpenedSubjectService {
      * @param openedSubject
      * @return DefaultRes
      */
-    public DefaultRes saveAllSemesterSubject (final OpenedSubject openedSubject) {
+    public DefaultRes saveAllSemesterSubject(final OpenedSubject openedSubject) {
         try {
             openedSubjectRepository.save(openedSubject);
             return DefaultRes.res(StatusCode.CREATED, "캠퍼스별 해당 학기 전체 과목 저장 성공");
@@ -43,10 +43,9 @@ public class OpenedSubjectService {
      *
      * @param campus
      * @param keyword
-     *
      * @return DefaultRes
      */
-    public DefaultRes findAllSubjectByCampusAndKeyword (final String campus, final String keyword, final String year, final String semester) {
+    public DefaultRes findAllSubjectByCampusAndKeyword(final String campus, final String keyword, final String year, final String semester) {
         try {
 
 
@@ -55,31 +54,22 @@ public class OpenedSubjectService {
 
             List<String> searchedResultList = new ArrayList<>();
 
-            for(int i = 0; i < semesterSubjectList.size(); i++){
+            for (int i = 0; i < semesterSubjectList.size(); i++) {
+                List<Subject> subjectList = semesterSubjectList.get(i).getSubjectList();
+                for (int j = 0; j < subjectList.size(); j++) {
 
-                if(!semesterSubjectList.get(i).getYear().equals(year) ||
-                        !semesterSubjectList.get(i).getSemester().equals(semester)){
-                    continue;
-                }
-                else{
-                    List<Subject> subjectList = semesterSubjectList.get(i).getSubjectList();
-                    for(int j = 0; j < subjectList.size(); j++){
+                    Subject subject = subjectList.get(j);
 
-                        Subject subject = subjectList.get(j);
+                    final String code = subject.getCode();
+                    final String name = subject.getName();
+                    final String professor = subject.getProfessor();
 
-                        final String code = subject.getCode();
-                        final String name = subject.getName();
-                        final String professor = subject.getProfessor();
-
-                        if((code.contains(keyword) || keyword.contains(code)) && !code.equals("")){
-                            searchedResultList.add(name + " / " + professor);
-                        }
-                        else if((name.contains(keyword) || keyword.contains(name)) && !name.equals("")){
-                            searchedResultList.add(name + " / " + professor);
-                        }
-                        else if((professor.contains(keyword) || keyword.contains(professor))&& !professor.equals("")){
-                            searchedResultList.add(name + " / " + professor);
-                        }
+                    if ((code.contains(keyword) || keyword.contains(code)) && !code.equals("")) {
+                        searchedResultList.add(name + " / " + professor);
+                    } else if ((name.contains(keyword) || keyword.contains(name)) && !name.equals("")) {
+                        searchedResultList.add(name + " / " + professor);
+                    } else if ((professor.contains(keyword) || keyword.contains(professor)) && !professor.equals("")) {
+                        searchedResultList.add(name + " / " + professor);
                     }
                 }
             }
@@ -101,20 +91,23 @@ public class OpenedSubjectService {
      * @param subjectTest
      * @return DefaultRes
      */
-    public DefaultRes save (final SubjectTest subjectTest) {
+    public DefaultRes save(final SubjectTest subjectTest, final String campus, final String year, final String semester) {
         try {
-
             OpenedSubject openedSubject = new OpenedSubject();
-            openedSubject.setCampus("서강대학교");
+
+            if (openedSubjectRepository.findByCampus(campus).isPresent()) {
+                openedSubject = openedSubjectRepository.findByCampus(campus).get();
+            }
+            openedSubject.setCampus(campus);
 
 
             SemesterSubject semesterSubject = new SemesterSubject();
-            semesterSubject.setSemester("1");
-            semesterSubject.setYear("2020");
+            semesterSubject.setSemester(semester);
+            semesterSubject.setYear(year);
 
             List<Subject> subjectList = new ArrayList<>();
 
-            for(int i = 0; i < subjectTest.getProfessor().size(); i++){
+            for (int i = 0; i < subjectTest.getProfessor().size(); i++) {
                 Subject subject = Subject.builder()
                         .department(subjectTest.getDepartment().get(i))
                         .gradePoint(subjectTest.getGradePoint().get(i))
@@ -129,6 +122,11 @@ public class OpenedSubjectService {
             semesterSubject.setSubjectList(subjectList);
 
             List<SemesterSubject> semesterSubjectList = new ArrayList<>();
+
+            if (openedSubjectRepository.findByCampus(campus).isPresent()) {
+                semesterSubjectList = openedSubjectRepository.findByCampus(campus).get().getSemesterSubjectList();
+            }
+
             semesterSubjectList.add(semesterSubject);
             openedSubject.setSemesterSubjectList(semesterSubjectList);
 
