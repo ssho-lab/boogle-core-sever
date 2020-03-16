@@ -1,6 +1,7 @@
 package kr.ant.booksharing.service;
 
 import kr.ant.booksharing.domain.*;
+import kr.ant.booksharing.model.AdminTransaction;
 import kr.ant.booksharing.model.BoogleBoxInfo;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.repository.*;
@@ -29,6 +30,7 @@ public class TransactionService {
     private final BoogleBoxRepository boogleBoxRepository;
     private final UserBankAccountRepository userBankAccountRepository;
     private final BankRepository bankRepository;
+    private final UserBankAccountService userBankAccountService;
 
     public TransactionService(final TransactionRepository transactionRepository,
                               final TransactionHistoryRepository transactionHistoryRepository,
@@ -40,7 +42,8 @@ public class TransactionService {
                               final UserRepository userRepository,
                               final BoogleBoxRepository boogleBoxRepository,
                               final UserBankAccountRepository userBankAccountRepository,
-                              final BankRepository bankRepository) {
+                              final BankRepository bankRepository,
+                              final UserBankAccountService userBankAccountService) {
         this.transactionRepository = transactionRepository;
         this.transactionHistoryRepository = transactionHistoryRepository;
         this.sellItemRepository = sellItemRepository;
@@ -52,6 +55,7 @@ public class TransactionService {
         this.boogleBoxRepository = boogleBoxRepository;
         this.userBankAccountRepository = userBankAccountRepository;
         this.bankRepository = bankRepository;
+        this.userBankAccountService = userBankAccountService;
     }
 
     /**
@@ -153,7 +157,12 @@ public class TransactionService {
      */
     public DefaultRes<List<Transaction>> findAllTransaction() {
         try {
-            return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionRepository.findAll());
+
+            List<Transaction> transactionList =
+                    transactionRepository.findAll();
+
+            return DefaultRes.res(StatusCode.OK, "거래 정보 목록 열람 성공", transactionList);
+
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.NOT_FOUND, "거래 정보 목록 열람 실패");
@@ -193,34 +202,40 @@ public class TransactionService {
             imageUrl = imageUrl.replace("type=m1", "");
             sellItem.setImageUrl(imageUrl);
 
-            if (currStep == 0) {
-
-                sendMailByStepAndTraderType(0, true,
-                        mailContentBuilderService.buildSellerBoogleBoxInfoInputRequest(sellItem, sellerUserName, buyerNickname), transaction);
-                sendMailByStepAndTraderType(0, false,
-                        mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
-
-            } else if (currStep == 2) {
-
-                sendMailByStepAndTraderType(2, false,
-                        mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
-                                transaction.getBoxId(), transaction.getBoxPassword()), transaction);
-
-            } else if (currStep == 4) {
-
-                UserBankAccount sellerUserBankAccount =
-                        userBankAccountRepository.findBy_id(sellItem.getSellerBankAccountId()).get();
-
-                String bankName = bankRepository.findBy_id(sellerUserBankAccount.getBankId()).get().getName();
-                String accountNumber = sellerUserBankAccount.getAccountNumber();
-
-                String sellerBankAccountInfo = bankName + " " + accountNumber;
-
-                sendMailByStepAndTraderType(4, true,
-                        mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname, sellerBankAccountInfo),
-                        transaction);
+            if(transaction.getTransactionType() == 0){
 
             }
+            else{
+                if (currStep == 0) {
+
+                    sendMailByStepAndTraderType(0, true,
+                            mailContentBuilderService.buildSellerBoogleBoxInfoInputRequest(sellItem, sellerUserName, buyerNickname), transaction);
+                    sendMailByStepAndTraderType(0, false,
+                            mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
+
+                } else if (currStep == 2) {
+
+                    sendMailByStepAndTraderType(2, false,
+                            mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
+                                    transaction.getBoxId(), transaction.getBoxPassword()), transaction);
+
+                } else if (currStep == 4) {
+
+                    UserBankAccount sellerUserBankAccount =
+                            userBankAccountRepository.findBy_id(sellItem.getSellerBankAccountId()).get();
+
+                    String bankName = bankRepository.findBy_id(sellerUserBankAccount.getBankId()).get().getName();
+                    String accountNumber = sellerUserBankAccount.getAccountNumber();
+
+                    String sellerBankAccountInfo = bankName + " " + accountNumber;
+
+                    sendMailByStepAndTraderType(4, true,
+                            mailContentBuilderService.buildSellerConfirmReceiveProductAndMoneyRequest(sellItem, sellerUserName, buyerNickname, sellerBankAccountInfo),
+                            transaction);
+                }
+            }
+
+
 
             return DefaultRes.res(StatusCode.CREATED, "거래 STEP 변경 성공");
         } catch (Exception e) {

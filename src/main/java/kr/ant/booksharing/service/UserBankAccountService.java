@@ -6,6 +6,7 @@ import kr.ant.booksharing.domain.UserBankAccount;
 import kr.ant.booksharing.model.DefaultRes;
 import kr.ant.booksharing.model.UserBankAccountRes;
 import kr.ant.booksharing.repository.BankRepository;
+import kr.ant.booksharing.repository.SellItemRepository;
 import kr.ant.booksharing.repository.UserBankAccountRepository;
 import kr.ant.booksharing.repository.UserBookmarkRepository;
 import kr.ant.booksharing.utils.StatusCode;
@@ -18,11 +19,14 @@ import java.util.List;
 public class UserBankAccountService {
     private final UserBankAccountRepository userBankAccountRepository;
     private final BankRepository bankRepository;
+    private final SellItemRepository sellItemRepository;
 
     public UserBankAccountService(final UserBankAccountRepository userBankAccountRepository,
-                                  final BankRepository bankRepository){
+                                  final BankRepository bankRepository,
+                                  final SellItemRepository sellItemRepository){
         this.userBankAccountRepository = userBankAccountRepository;
         this.bankRepository = bankRepository;
+        this.sellItemRepository = sellItemRepository;
     }
 
     /**
@@ -42,7 +46,7 @@ public class UserBankAccountService {
     }
 
     /**
-     * 계좌 정보 조회
+     * 회원별 계좌 정보 조회
      *
      * @param userId 회원 고유 번호
      * @return DefaultRes
@@ -61,6 +65,32 @@ public class UserBankAccountService {
         } catch (Exception e) {
             System.out.println(e);
             return DefaultRes.res(StatusCode.DB_ERROR, "전체 은행 정보 조회 실패");
+        }
+    }
+
+    /**
+     * 계좌번호 + 은행명 조회
+     *
+     * @param bankAccountId 계좌 고유 번호
+     * @return DefaultRes
+     */
+    public String findAccountNumberAndBankNameByBankAccountId (final String bankAccountId) {
+
+        try {
+
+            String sellerBankAccountId =
+                    sellItemRepository.findBySellerBankAccountId(bankAccountId).get().getSellerBankAccountId();
+
+            UserBankAccount userBankAccount =
+                    userBankAccountRepository.findBy_id(sellerBankAccountId).get();
+
+            String bankName = bankRepository.findBy_id(userBankAccount.getBankId()).get().getName();
+            String accountNumber = userBankAccount.getAccountNumber();
+
+            return bankName + "/" +accountNumber;
+
+        } catch (Exception e) {
+            return "";
         }
     }
 

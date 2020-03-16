@@ -62,8 +62,8 @@ public class HomeService {
      */
     public List<SellItem> findRecentRegisteredSellItemList() {
         List<SellItem> recentRegisteredSellItemList = new ArrayList<>();
-        if(sellItemRepository.findTop4ByIsTradedOrderByRegiTimeDesc(false).isPresent()){
-            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByIsTradedOrderByRegiTimeDesc(false).get());
+        if(sellItemRepository.findTop12ByIsTradedOrderByRegiTimeDesc(false).isPresent()){
+            recentRegisteredSellItemList.addAll(sellItemRepository.findTop12ByIsTradedOrderByRegiTimeDesc(false).get());
         }
         return recentRegisteredSellItemList;
     }
@@ -96,10 +96,10 @@ public class HomeService {
             List<Item> mostRegisteredItemList = itemRepository.findByOrderByRegiCountDesc().get();
 
             for(Item item : mostRegisteredItemList){
-                if(recentRegisteredSellItemList.size() > 3) break;
                 if(sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).isPresent()){
                     recentRegisteredSellItemList.addAll(sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).get());
                 }
+                if(recentRegisteredSellItemList.size() >= 4) break;
             }
         }
 
