@@ -58,6 +58,12 @@ public class TransactionService {
         this.userBankAccountService = userBankAccountService;
     }
 
+    public void addFields() {
+        List<Transaction> transactionList = transactionRepository.findAll();
+        transactionList.stream().forEach(t->{ t.setPaymentDoneConfirmed(false); t.setBoogleBoxInfoConfirmed(false);});
+        transactionRepository.saveAll(transactionList);
+    }
+
     /**
      * 거래 정보 저장
      *
@@ -213,13 +219,18 @@ public class TransactionService {
                     sendMailByStepAndTraderType(0, false,
                             mailContentBuilderService.buildBuyerPaymentRequest(sellItem, buyerUserName, sellerNickname), transaction);
 
-                } else if (currStep == 2) {
+                }
+                /*
+                else if (currStep == 2) {
 
                     sendMailByStepAndTraderType(2, false,
                             mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
                                     transaction.getBoxId(), transaction.getBoxPassword()), transaction);
 
-                } else if (currStep == 4) {
+                }                  */
+
+                else if (currStep == 4) {
+
 
                     UserBankAccount sellerUserBankAccount =
                             userBankAccountRepository.findBy_id(sellItem.getSellerBankAccountId()).get();
@@ -287,6 +298,97 @@ public class TransactionService {
      * @return DefaultRes
      */
     public DefaultRes<Transaction> savePaymentDoneAndChangeStep(final String sellItemId) {
+        try {
+
+            Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
+            transaction.setPaymentDone(true);
+            transactionRepository.save(transaction);
+
+            if (!transaction.getBoxId().equals("") && !transaction.getBoxPassword().equals("")) {
+                changeTransactionStep(sellItemId);
+            }
+
+            return DefaultRes.res(StatusCode.CREATED, "송금 완료 상태 저장 성공");
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "송금 완료 상태 저장 실패");
+        }
+    }
+
+    /**
+     * 북을 박스 정보 확인 및 STEP 변경
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<Transaction> saveBoogleBoxInfoConfirmedAndChangeStep(final String sellItemId) {
+        try {
+
+            Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
+            transaction.setBoogleBoxInfoConfirmed(true);
+            transactionRepository.save(transaction);
+
+            SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
+
+            String buyerUserName = userRepository.findById(transaction.getBuyerId()).get().getName();
+
+            String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
+
+            sendMailByStepAndTraderType(2, false,
+                    mailContentBuilderService.buildBuyerConfirmBoogleBoxInfoRequest(sellItem, buyerUserName, sellerNickname,
+                            transaction.getBoxId(), transaction.getBoxPassword()), transaction);
+
+            if (transaction.isPaymentDoneConfirmed()) {
+                changeTransactionStep(sellItemId);
+            }
+
+            return DefaultRes.res(StatusCode.CREATED, "북을 박스 정보 확인 저장 성공");
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "북을 박스 정보 확인 저장 실패");
+        }
+    }
+
+    /**
+     * 송금 완료 확인 저장 및 STEP 변경
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<Transaction> savePaymentDoneConfirmedAndChangeStep(final String sellItemId) {
+        try {
+
+            Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
+            transaction.setPaymentDoneConfirmed(true);
+            transactionRepository.save(transaction);
+
+            SellItem sellItem = sellItemRepository.findBy_id(transaction.getSellItemId()).get();
+
+            String buyerUserName = userRepository.findById(transaction.getBuyerId()).get().getName();
+
+            String sellerNickname = userRepository.findById(transaction.getSellerId()).get().getNickname();
+
+            sendExtraMailAtStep2(mailContentBuilderService.buildBuyerConfirmPaymentInfoRequest(sellItem, buyerUserName, sellerNickname,
+                            transaction.getBoxId(), transaction.getBoxPassword()), transaction);
+
+            if (transaction.isBoogleBoxInfoConfirmed()) {
+                changeTransactionStep(sellItemId);
+            }
+
+            return DefaultRes.res(StatusCode.CREATED, "송금 완료 확인 저장 성공");
+        } catch (Exception e) {
+            System.out.println(e);
+            return DefaultRes.res(StatusCode.DB_ERROR, "송금 완료 확인 저장 실패");
+        }
+    }
+
+    /**
+     * STEP1에서 송금 완료 확인 저장 및 STEP 변경
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes<Transaction> savePaymentDoneConfirmedAtStep1AndChangeStep(final String sellItemId) {
         try {
 
             Transaction transaction = transactionRepository.findBySellItemId(sellItemId).get();
@@ -415,6 +517,11 @@ public class TransactionService {
                 javaMailSender.send(mimeMessagePreparator);
             }
         }
-
+    }
+    private void sendExtraMailAtStep2(final String content, final Transaction transaction) {
+        MimeMessagePreparator mimeMessagePreparator =
+                mailSenderService.createMimeMessage(userRepository.findById(transaction.getBuyerId()).get().getEmail(),
+                        "[북을] 입금 확인 완료", content);
+        javaMailSender.send(mimeMessagePreparator);
     }
 }

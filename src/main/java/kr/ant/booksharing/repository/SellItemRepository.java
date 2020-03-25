@@ -17,9 +17,7 @@ public interface SellItemRepository extends MongoRepository<SellItem, String> {
     Optional<List<SellItem>> findAllByItemId(String itemId);
     Optional<List<SellItem>> findAllByTitleContainingAndIsTraded(String keyword, boolean isTraded);
 
-    @Query("{ 'title' : ?0 }")
-    List<SellItem> findAllGroupByItemIdContaining(String keyword);
-
+    Optional<List<SellItem>> findAllByIsTraded(boolean isTraded);
     Optional<List<SellItem>> findTop4ByIsTradedOrderByRegiTimeDesc(boolean isTraded);
     Optional<List<SellItem>> findTop12ByIsTradedOrderByRegiTimeDesc(boolean isTraded);
     Optional<List<SellItem>> findTop4ByIsTradedOrderByRegiPriceAsc(boolean isTraded);

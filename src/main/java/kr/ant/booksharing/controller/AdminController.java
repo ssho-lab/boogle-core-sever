@@ -103,6 +103,51 @@ public class AdminController {
     }
 
     /**
+     * 북을 박스 정보 확인 및 거래 STEP 변경
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/booglebox/confirm")
+    public ResponseEntity confirmBoogleBoxInfo(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.saveBoogleBoxInfoConfirmedAndChangeStep(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 송금 확인 및 거래 STEP 변경
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/payment/confirm")
+    public ResponseEntity confirmPaymentDone(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.savePaymentDoneConfirmedAndChangeStep(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * STEP1에서 송금 완료 확인 저장 및 STEP 변경
+     *
+     * @return ResponseEntity
+     */
+    @GetMapping("/payment/confirm/step1")
+    public ResponseEntity confirmPaymentDoneAtStep1(@RequestParam("sellItemId")final String sellItemId) {
+        try {
+            return new ResponseEntity<>(transactionService.savePaymentDoneConfirmedAtStep1AndChangeStep(sellItemId),HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
      * 구매자 이름 조회
      *
      * @return ResponseEntity

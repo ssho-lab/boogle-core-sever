@@ -97,6 +97,8 @@ public class MyPageService {
                                     .boxId(buyerTransaction.getBoxId())
                                     .boxPassword(buyerTransaction.getBoxPassword())
 
+                                    .isPaymentDone(buyerTransaction.isPaymentDone())
+
                                     .title(sellItemRepository.findBy_id(buyerTransaction.getSellItemId())
                                             .get().getTitle())
                                     .itemImageUrl(sellItemRepository.findBy_id(buyerTransaction.getSellItemId()).get().getImageUrl())
@@ -131,6 +133,8 @@ public class MyPageService {
                                     .boxId(sellerTransaction.getBoxId())
                                     .boxPassword(sellerTransaction.getBoxPassword())
 
+                                    .isPaymentDone(sellerTransaction.isPaymentDone())
+
                                     .title(sellItemRepository.findBy_id(sellerTransaction.getSellItemId())
                                             .get().getTitle())
 
@@ -161,6 +165,8 @@ public class MyPageService {
                                     .transactionStep(-1)
                                     .boxId("")
                                     .boxPassword("")
+
+                                    .isPaymentDone(false)
 
                                     .title(s.getTitle())
                                     .itemImageUrl(s.getImageUrl())

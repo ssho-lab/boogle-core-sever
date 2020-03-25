@@ -1,5 +1,6 @@
 package kr.ant.booksharing.repository;
 
+import com.mongodb.lang.Nullable;
 import kr.ant.booksharing.domain.Transaction;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -12,4 +13,7 @@ public interface TransactionRepository extends MongoRepository<Transaction, Stri
     Optional<List<Transaction>> findAllByBuyerId(final int buyerId);
     void deleteBySellItemId(final String sellItemId);
     Optional<List<Transaction>> findAllByStepEquals(final int step);
+
+    @Nullable
+    List<Transaction> findAll();
 }

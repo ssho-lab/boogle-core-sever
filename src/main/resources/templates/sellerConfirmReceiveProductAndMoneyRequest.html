@@ -41,7 +41,7 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
-            color: #292929;" th:text="${'이에 따라, 거래 대금인 ' + regiPrice + '원이 24시간 이내에 ' + userName + ' 님의 ' + sellerAccountInfo + ' 계좌로 입금될 예정입니다.' }"></p>
+            color: #292929;" th:text="${'이에 따라, 거래 대금인 ' + originalPrice + '원이 24시간 이내에 ' + userName + ' 님의 ' + sellerAccountInfo + ' 계좌로 입금될 예정입니다.' }"></p>
 
         <p style="
             text-align: center;
@@ -97,7 +97,7 @@
                 font-weight: 300;
                 line-height: 1.21;
                 text-align: left;
-                color: #656565;" th:text="${'주문일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}"></h3>
+                color: #656565;" th:text="${'주문일자 : ' + regiTime + ' | 금액 : ' + originalPrice + '원'}"></h3>
 
                 <h2 style="
                 font-family: 'Noto Sans KR', 'helvetica', sans-serif;

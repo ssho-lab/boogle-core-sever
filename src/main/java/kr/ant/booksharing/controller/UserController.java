@@ -2,6 +2,7 @@ package kr.ant.booksharing.controller;
 
 import kr.ant.booksharing.domain.User;
 import kr.ant.booksharing.model.DefaultRes;
+import kr.ant.booksharing.model.ModificationPassword;
 import kr.ant.booksharing.model.SignIn.SignInReq;
 import kr.ant.booksharing.model.SignUp.SignUpReq;
 import kr.ant.booksharing.model.UserModificationReq;
@@ -173,6 +174,21 @@ public class UserController {
         try {
             final int userIdx = (int) httpServletRequest.getAttribute("userIdx");
             return new ResponseEntity<>(userService.compareBetweenUserTokenAndUserId(userIdx, userId), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("{}", e);
+            return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /**
+     * 회원 비밀번호 변경
+     *
+     * @return ResponseEntity
+     */
+    @PostMapping("/modification/password")
+    public ResponseEntity modifyPassword(@RequestBody ModificationPassword modificationPassword) {
+        try {
+            return new ResponseEntity<>(userService.modifyPassword(modificationPassword.getEmail(), modificationPassword.getPassword(), modificationPassword.getPostPassword()), HttpStatus.OK);
         } catch (Exception e) {
             log.error("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);

@@ -143,9 +143,38 @@ public class SellItemController {
     @PostMapping("/payback")
     public ResponseEntity registerPaybackedItem() {
         try {
-            String[] sellItemIdArray = {"5e6da1719870902d7152f91d","5e6ce27a9870901e02c4e0f4", "5e6ccfed9870901e02c4e0c4", "5e6ca3aa9870901e02c4e0b9",
-            "5e6db1869870902d7152f923", "5e6db2189870902d7152f925", "5e6db2c99870902d7152f927", "5e6ddcab9870902d7152f931", "5e6de3189870902d7152f937",
-            "5e6de3ff9870902d7152f939", "5e6e02789870902d7152f943"};
+            String[] sellItemIdArray = {"5e6da1719870902d7152f91d",
+                    "5e6ce27a9870901e02c4e0f4",
+                    "5e6ccfed9870901e02c4e0c4",
+                    "5e6ca3aa9870901e02c4e0b9",
+                    "5e6ddd1e9870902d7152f933",
+                    "5e6db1869870902d7152f923",
+                    "5e6de3189870902d7152f937",
+                    "5e6ddcab9870902d7152f931",
+                    "5e6db2189870902d7152f925",
+                    "5e6db2c99870902d7152f927",
+                    "5e6de3ff9870902d7152f939",
+                    "5e6e02789870902d7152f943",
+                    "5e6e317298709048ab4520e8",
+                    "5e6dfbc69870902d7152f940",
+                    "5e6dfcc29870902d7152f942",
+                    "5e6e3e4698709048ab452121",
+                    "5e6e3f8798709048ab452127",
+                    "5e6e48f598709048ab45212f",
+                    "5e6e497398709048ab452134",
+                    "5e6e4abc98709048ab452136",
+                    "5e6e4b0098709048ab452138",
+                    "5e6e4b8098709048ab45213a",
+                    "5e6e4bda98709048ab45213c",
+                    "5e6e4c8098709048ab452140",
+                    "5e6f73b29870905ccf110bb3",
+                    "5e6f82019870905ccf110bc1",
+                    "5e6f85e49870905ccf110bc7",
+                    "5e6fbf189870907137560d84",
+                    "5e709adb98709007f30d5222",
+                    "5e709d1998709007f30d5228",
+                    "5e718b0798709021712bfcf4"};
+
 
             List<PaybackedSellItem> paybackedSellItemList = new ArrayList<>();
 

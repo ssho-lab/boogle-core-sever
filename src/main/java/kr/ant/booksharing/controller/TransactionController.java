@@ -25,6 +25,11 @@ public class TransactionController {
         this.transactionService = transactionService;
     }
 
+    @GetMapping("/add")
+    public void addFields(){
+        transactionService.addFields();
+    }
+
     /**
      * 거래 정보 등록
      *
@@ -56,7 +61,7 @@ public class TransactionController {
         try {
             return new ResponseEntity<>(transactionService.changeTransactionStep(sellItemId),HttpStatus.OK);
         } catch (Exception e) {
-            log.error("{}", e);
+            log.info("{}", e);
             return new ResponseEntity<>(FAIL_DEFAULT_RES, HttpStatus.NOT_FOUND);
         }
     }

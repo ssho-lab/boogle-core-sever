@@ -340,4 +340,31 @@ public class UserService {
             return DefaultRes.res(StatusCode.DB_ERROR, "회원 토큰과 회원 고유 번호 비교 실패");
         }
     }
+
+    /**
+     * 회원 비밀번호 변경
+     *
+     * @param
+     * @return DefaultRes
+     */
+    public DefaultRes modifyPassword(final String email, final String password, final String postPassword) {
+        try {
+            SignInReq signInReq = SignInReq.builder().email(email).password(password).build();
+            if(authUser(signInReq).getStatus() == 200){
+                User user = userRepository.findByEmail(email).get();
+
+                String encodedPassword = passwordEncoder.encode(postPassword);
+                user.setPassword(encodedPassword);
+
+                userRepository.save(user);
+
+                return DefaultRes.res(StatusCode.CREATED, "회원 비밀번호 변경 성공");
+            }
+            else{
+                return DefaultRes.res(StatusCode.DB_ERROR, "회원 비밀번호 변경 실패");
+            }
+        } catch (Exception e) {
+            return DefaultRes.res(StatusCode.DB_ERROR, "회원 비밀번호 변경 성공 실패");
+        }
+    }
 }

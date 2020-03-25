@@ -41,6 +41,40 @@
             font-weight: normal;
             line-height: 1.67;
             letter-spacing: normal;
+            color: #292929;" th:text="${'디지털락 왼쪽 상단 램프가 깜빡이지 않는 박스를 사용하실 수 있습니다.'}"></p>
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${'사용 가능한 박스에 물품을 보관한 후 디지털락 '' 버튼을 누르고 원하는 비밀번호 4자리를 설정한 후 '' 버튼을 누르면 보관함이 잠깁니다.'}"></p>
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${'디지털락 상단 램프에 파란색 등이 깜빡이는 것을 꼭 확인해주세요!'}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
+            color: #292929;" th:text="${''}"></p>
+
+        <p style="
+            text-align: center;
+            font-family: 'Noto Sans KR', 'helvetica', sans-serif;
+            font-size: 15px;
+            font-weight: normal;
+            line-height: 1.67;
+            letter-spacing: normal;
             color: #292929;" th:text="${'물품을 안전하게 비치하신 후, 아래 버튼을 통해 북을박스 번호와 비밀번호를 저희에게 알려주세요! 48시간 이내에 북을박스 번호와 비밀번호가 확인되지 않을 시' + userName + ' 님의 신용도가 떨어져 이후 거래에 불이익을 받을 수 있습니다. :-('}"></p>
 
         <p style="
@@ -115,7 +149,7 @@
                 font-weight: 300;
                 line-height: 1.21;
                 text-align: left;
-                color: #656565;" th:text="${'등록일자 : ' + regiTime + ' | 금액 : ' + regiPrice + '원'}"></h3>
+                color: #656565;" th:text="${'등록일자 : ' + regiTime + ' | 금액 : ' + originalPrice + '원'}"></h3>
 
                 <h2 style="
                 font-family: 'Noto Sans KR', 'helvetica', sans-serif;

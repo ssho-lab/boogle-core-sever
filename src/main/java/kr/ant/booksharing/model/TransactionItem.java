@@ -18,6 +18,7 @@ public class TransactionItem {
     private String itemImageUrl;
     private String boxId;
     private String boxPassword;
+    private boolean isPaymentDone;
     private Date transactionCreatedTime;
     private List<Date> transactionProcessedTimeList;
     private int transactionStep;

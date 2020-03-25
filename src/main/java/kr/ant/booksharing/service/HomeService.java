@@ -15,8 +15,7 @@ import kr.ant.booksharing.utils.StatusCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -75,11 +74,15 @@ public class HomeService {
      * @return DefaultRes
      */
     public List<SellItem> findLowestPriceSellItemList() {
-        List<SellItem> recentRegisteredSellItemList = new ArrayList<>();
-        if(sellItemRepository.findTop4ByIsTradedOrderByRegiPriceAsc(false).isPresent()){
-            recentRegisteredSellItemList.addAll(sellItemRepository.findTop4ByIsTradedOrderByRegiPriceAsc(false).get());
-        }
-        return recentRegisteredSellItemList;
+
+        List<SellItem> recentRegisteredSellItemList = sellItemRepository.findAllByIsTraded(false).get();
+
+        Collections.sort(recentRegisteredSellItemList, (s1, s2) -> {
+            if(Integer.parseInt(s1.getRegiPrice()) <= Integer.parseInt(s2.getRegiPrice())) return -1;
+            return 1;
+        });
+
+        return recentRegisteredSellItemList.subList(0,8);
     }
 
     /**

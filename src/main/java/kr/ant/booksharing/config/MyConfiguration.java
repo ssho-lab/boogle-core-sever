@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-public class  MyConfiguration extends WebSecurityConfigurerAdapter {
+public class MyConfiguration extends WebSecurityConfigurerAdapter {
 
     protected Logger logger = LogManager.getLogger(this.getClass());
 

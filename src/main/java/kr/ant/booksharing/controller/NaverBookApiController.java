@@ -72,35 +72,41 @@ public class NaverBookApiController {
                 List<Item> itemList = itemRepository.findAll();
                 for (Item item : itemList) {
 
-                    boolean isKeywordMatched = false;
-
-                    if(searchService.search(keyword, item.getTitle())) isKeywordMatched = true;
-
-                    //if(item.getTitle().contains(keyword) || keyword.contains(item.getTitle())) isKeywordMatched = true;
-
-                    for(String subject : item.getSubjectList()){
-                        if(subject == null || subject.equals("") || subject.length() == 0) break;
-                        if(subject.contains(keyword) || keyword.contains(subject)){
-                            isKeywordMatched = true;
-                            break;
-                        }
-                    }
-
-                    for(String professor : item.getProfessorList()){
-                        if(professor == null || professor.equals("") || professor.length() == 0) break;
-                        if(professor.contains(keyword) || keyword.contains(professor)){
-                            isKeywordMatched = true;
-                            break;
-                        }
-                    }
-
-                    if(isKeywordMatched == false || item.getRegiCount() < 1) continue;
-
                     ItemRes itemRes = new ItemRes();
+
+                    if(!keyword.equals("allList")) {
+                        boolean isKeywordMatched = false;
+
+                        if (searchService.search(keyword, item.getTitle())) isKeywordMatched = true;
+
+                        if (item.getSubjectList() == null) continue;
+
+                        for (String subject : item.getSubjectList()) {
+                            if (subject == null || subject.equals("") || subject.length() == 0) break;
+                            if (subject.contains(keyword) || keyword.contains(subject)) {
+                                isKeywordMatched = true;
+                                break;
+                            }
+                        }
+
+                        if (item.getProfessorList() == null) continue;
+
+                        for (String professor : item.getProfessorList()) {
+                            if (professor == null || professor.equals("") || professor.length() == 0) break;
+                            if (professor.contains(keyword) || keyword.contains(professor)) {
+                                isKeywordMatched = true;
+                                break;
+                            }
+                        }
+
+                        if (isKeywordMatched == false || item.getRegiCount() < 1) continue;
+
+                        }
 
                     List<SellItem> sellItemList =
                             sellItemRepository.findAllByItemIdAndIsTraded(item.getItemId(), false).get();
 
+                    if(sellItemList.size() == 0) continue;
                     SellItem sellItem = sellItemList.get(0);
 
                     itemIdList.add(sellItem.getItemId());
@@ -128,7 +134,10 @@ public class NaverBookApiController {
                 }
             }
 
-            sortSearchedItemResList(itemResList, itemResListSortType, keyword);
+            if(!itemResListSortType.equals("regiTime")) sortSearchedItemResList(itemResList, itemResListSortType, keyword);
+
+            else Collections.reverse(itemResList);
+
             ItemAllRes itemAllRes =
                     ItemAllRes.builder().itemResList(itemResList).itemNotRegisteredResList(new ArrayList<>()).build();
 
@@ -138,6 +147,9 @@ public class NaverBookApiController {
                 return new ResponseEntity<>(itemAllRes, HttpStatus.OK);
             }
 
+            if (keyword.equals("allList")) {
+                return new ResponseEntity<>(ItemAllRes.builder().itemResList(itemResList).itemNotRegisteredResList(new ArrayList<>()).build(),HttpStatus.OK);
+            }
 
             String booksFromNaverBookApi = getAllBooksFromNaverBookApi(keyword);
             JSONParser parser = new JSONParser();
@@ -478,12 +490,15 @@ public class NaverBookApiController {
 
         // 1) 정확도순 : 일치도 -> 판매량
         if (sortType.equals("accuracy")) {
+            String finalKeyword = keyword;
+
             Collections.sort(itemResList, (o1, o2) -> {
-                if (StringUtils.countMatches(o1.getTitle(), keyword)
-                        > StringUtils.countMatches(o2.getTitle(), keyword)) {
+                if(finalKeyword.equals("allList")) return 0;
+                if (StringUtils.countMatches(o1.getTitle(), finalKeyword)
+                        > StringUtils.countMatches(o2.getTitle(), finalKeyword)) {
                     return -1;
-                } else if (StringUtils.countMatches(o1.getTitle(), keyword)
-                        == StringUtils.countMatches(o2.getTitle(), keyword)) {
+                } else if (StringUtils.countMatches(o1.getTitle(), finalKeyword)
+                        == StringUtils.countMatches(o2.getTitle(), finalKeyword)) {
                     if (o1.getRegiCount() >= o2.getRegiCount()) return -1;
                     else return 1;
                 }
@@ -526,15 +541,18 @@ public class NaverBookApiController {
 
     public void sortSearchedItemNotRegisteredResList(List<ItemRes> itemNotRegisteredResList, String sortType, String keyword, boolean isBuy) {
 
+        if(keyword.equals("allList")) keyword = "";
+
         // 1) 정확도순 : 일치도 -> 판매량
         if (sortType.equals("accuracy")) {
             if(isBuy){
+                String finalKeyword = keyword;
                 Collections.sort(itemNotRegisteredResList, (o1, o2) -> {
-                    if (StringUtils.countMatches(o1.getTitle(), keyword)
-                            > StringUtils.countMatches(o2.getTitle(), keyword)) {
+                    if (StringUtils.countMatches(o1.getTitle(), finalKeyword)
+                            > StringUtils.countMatches(o2.getTitle(), finalKeyword)) {
                         return -1;
-                    } else if (StringUtils.countMatches(o1.getTitle(), keyword)
-                            == StringUtils.countMatches(o2.getTitle(), keyword)) {
+                    } else if (StringUtils.countMatches(o1.getTitle(), finalKeyword)
+                            == StringUtils.countMatches(o2.getTitle(), finalKeyword)) {
                         if (sellItemHistoryRepository.countByItemId(o1.getItemId()) >=
                                 sellItemHistoryRepository.countByItemId(o2.getItemId())) return -1;
                         else return 1;

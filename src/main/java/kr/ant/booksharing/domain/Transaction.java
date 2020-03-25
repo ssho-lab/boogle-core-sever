@@ -1,5 +1,6 @@
 package kr.ant.booksharing.domain;
 
+import com.mongodb.lang.Nullable;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -32,4 +33,9 @@ public class Transaction {
     private String boxPassword;
 
     private boolean isPaymentDone;
+
+    @Nullable
+    private boolean isPaymentDoneConfirmed;
+    @Nullable
+    private boolean isBoogleBoxInfoConfirmed;
 }

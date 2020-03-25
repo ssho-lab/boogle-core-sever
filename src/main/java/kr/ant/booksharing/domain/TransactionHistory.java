@@ -1,5 +1,6 @@
 package kr.ant.booksharing.domain;
 
+import com.mongodb.lang.Nullable;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

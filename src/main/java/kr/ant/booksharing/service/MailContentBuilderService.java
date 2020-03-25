@@ -31,7 +31,7 @@ public class MailContentBuilderService {
         context.setVariable("buyerNickname", buyerNickname);
         context.setVariable("title", sellItem.getTitle());
         context.setVariable("imageUrl", sellItem.getImageUrl());
-        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        context.setVariable("originalPrice", sellItem.getOriginalPrice());
         SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
         Date regiTime = sellItem.getRegiTime();
         context.setVariable("regiTime", format.format(regiTime));
@@ -45,7 +45,7 @@ public class MailContentBuilderService {
         context.setVariable("buyerNickname", buyerNickname);
         context.setVariable("title", sellItem.getTitle());
         context.setVariable("imageUrl", sellItem.getImageUrl());
-        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        context.setVariable("originalPrice", sellItem.getOriginalPrice());
         SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
         Date regiTime = sellItem.getRegiTime();
         context.setVariable("regiTime", format.format(regiTime));
@@ -68,7 +68,7 @@ public class MailContentBuilderService {
     }
 
     public String buildBuyerConfirmBoogleBoxInfoRequest(SellItem sellItem, String userName, String sellerNickname,
-                                                        String boogleBoxId, String boogleBoxPassword) {
+                                                             String boogleBoxId, String boogleBoxPassword) {
         Context context = new Context();
         context.setVariable("userName", userName);
         context.setVariable("sellerNickname", sellerNickname);
@@ -84,6 +84,23 @@ public class MailContentBuilderService {
         return templateEngine.process("buyerConfirmBoogleBoxInfoRequest", context);
     }
 
+    public String buildBuyerConfirmPaymentInfoRequest(SellItem sellItem, String userName, String sellerNickname,
+                                                        String boogleBoxId, String boogleBoxPassword) {
+        Context context = new Context();
+        context.setVariable("userName", userName);
+        context.setVariable("sellerNickname", sellerNickname);
+        context.setVariable("title", sellItem.getTitle());
+        context.setVariable("imageUrl", sellItem.getImageUrl());
+        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        context.setVariable("boogleBoxId", boogleBoxId);
+        context.setVariable("boogleBoxPassword", boogleBoxPassword);
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
+        Date regiTime = sellItem.getRegiTime();
+        context.setVariable("regiTime", format.format(regiTime));
+        context.setVariable("sellerId", sellItem.getSellerId());
+        return templateEngine.process("buyerConfirmPaymentInfoRequest", context);
+    }
+
     public String buildSellerConfirmReceiveProductAndMoneyRequest(SellItem sellItem, String userName, String buyerNickname,
                                                                   String sellerAccountInfo) {
         Context context = new Context();
@@ -91,7 +108,7 @@ public class MailContentBuilderService {
         context.setVariable("buyerNickname", buyerNickname);
         context.setVariable("title", sellItem.getTitle());
         context.setVariable("imageUrl", sellItem.getImageUrl());
-        context.setVariable("regiPrice", sellItem.getRegiPrice());
+        context.setVariable("originalPrice", sellItem.getOriginalPrice());
         context.setVariable("sellerAccountInfo", sellerAccountInfo);
         SimpleDateFormat format = new SimpleDateFormat ( "yyyy.MM.dd");
         Date regiTime = sellItem.getRegiTime();
